@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "types": ["web"],
+    "strict": true,
+    // The bridge template toggles post effects with `cond ? <primitive/> : null`
+    // children, but @react-three/postprocessing 3.0.4 types EffectComposer children
+    // as JSX.Element | JSX.Element[] (no null). strictNullChecks off accommodates
+    // that without editing template code.
+    "strictNullChecks": false,
+    // The template relies on a few inferred `any` types (e.g. the GLTF kit loader
+    // in world.ts); keep noImplicitAny off rather than editing template code.
+    "noImplicitAny": false,
+    "noEmit": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": false
+  },
+  "exclude": ["remotion.config.ts"]
+}

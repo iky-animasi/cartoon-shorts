@@ -1,0 +1,70 @@
+# Render paralel GitHub Actions — 1.879 frame dibagi ke 10 job matrix,
+# tiap job render satu potongan (chunk) video, lalu job merge menggabung
+# semua potongan jadi satu file. Taruh di .github/workflows/render-parallel.yml
+#
+# PENTING: jalankan render-test.yml DULU. Kalau detik/frame x 188 > ~5 jam,
+# kurangi frame per job (naikkan jumlah chunk) supaya tidak kena batas 6 jam/job.
+name: Render paralel (10 mesin)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render-chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Chrome system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 libcairo2 libnss3 libnspr4 libx11-6 libxext6
+      - name: Install project dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          node scripts/patch-remotion-ports.mjs
+          npx remotion browser ensure
+      - name: Render chunk ${{ matrix.chunk }}
+        run: |
+          mkdir -p out .remotion-tmp
+          START=$(( ${{ matrix.chunk }} * 188 ))
+          END=$(( START + 187 ))
+          if [ $END -gt 1878 ]; then END=1878; fi
+          echo "Chunk ${{ matrix.chunk }}: frame $START-$END"
+          REMOTION_TMP=$PWD/.remotion-tmp npx remotion render MolassesShort out/chunk-${{ matrix.chunk }}.mp4 --frames=$START-$END
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chunk-${{ matrix.chunk }}
+          path: out/chunk-${{ matrix.chunk }}.mp4
+
+  merge:
+    needs: render-chunk
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: chunk-*
+          path: chunks
+          merge-multiple: true
+      - name: Gabung semua chunk (ffmpeg concat)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+          for i in 0 1 2 3 4 5 6 7 8 9; do echo "file 'chunks/chunk-$i.mp4'" >> list.txt; done
+          cat list.txt
+          ffmpeg -y -f concat -safe 0 -i list.txt -c copy molasses-full-videoonly.mp4
+          ls -lh molasses-full-videoonly.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: molasses-full-videoonly
+          path: molasses-full-videoonly.mp4
+# Catatan: hasil merge ini video saja (tanpa audio). Audio final (mix.wav)
+# digabung lokal di VM Muse, tempat mix.wav sudah tersimpan.

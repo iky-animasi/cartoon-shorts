@@ -1,0 +1,41 @@
+# Tes kecil GitHub Actions — ukur waktu render per frame di runner GitHub.
+# Render 10 frame (975-984) di skala penuh 1080p, catat detik/frame.
+# Hasilnya menentukan berapa frame per job aman untuk render paralel penuh
+# (batas 1 job = 6 jam). Taruh file ini di .github/workflows/render-test.yml
+name: Render test (10 frame)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Chrome system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 libcairo2 libnss3 libnspr4 libx11-6 libxext6
+      - name: Install project dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          node scripts/patch-remotion-ports.mjs
+          npx remotion browser ensure
+      - name: Render 10 frame + ukur waktu
+        run: |
+          mkdir -p out .remotion-tmp
+          START=$(date +%s)
+          REMOTION_TMP=$PWD/.remotion-tmp npx remotion render MolassesShort out/test-10frame.mp4 --frames=975-984
+          END=$(date +%s)
+          echo "TOTAL_DETIK=$((END-START))"
+          echo "DETIK_PER_FRAME=$(( (END-START) / 10 ))"
+          ls -lh out/test-10frame.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-10frame
+          path: out/test-10frame.mp4
