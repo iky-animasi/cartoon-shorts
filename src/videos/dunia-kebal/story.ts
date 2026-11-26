@@ -82,35 +82,37 @@ export const lionX = (f: number) => (f < 973 ? 1.35 : 1.35 + ((f - 973) / 42) * 
 
 const S = STREET, D = DAPUR, P = PERIKSA, G = SUNGAI, T = TAMAN, L = SINGA, R = RUMAH;
 // shot 1: street MS, tracks the walk, push on the ball hit
-const S1a = (f: number) => dolly([S[0] - 0.4, D0 + 1.9, S[2] + 8.4], [S[0] + 0.2, D0 + 1.3, S[2]], pushK(f, 0, 0.0022), { fov: 42 });
-const S1b = (f: number) => dolly([S[0] + 0.6, D0 + 1.7, S[2] + 7.2], [S[0] + 0.5, D0 + 1.25, S[2]], pushK(f, 100, 0.002, 0.006, 30), { fov: 40 });
+const S1a = (f: number) => dolly([S[0] - 0.4, D0 + 1.9, S[2] + 8.4], [S[0] + 0.2, D0 + 1.3, S[2]], pushK(f, 0, 0.0032), { fov: 42 });
+const S1b = (f: number) => dolly([S[0] + 0.6, D0 + 1.7, S[2] + 7.2], [S[0] + 0.5, D0 + 1.25, S[2]], pushK(f, 100, 0.003, 0.006, 30), { fov: 40 });
 // shot 2: kitchen MS, push to the knife slip
-const S2a = (f: number) => dolly([D[0] + 0.3, D0 + 1.9, D[2] - 7.2], [D[0], D0 + 1.3, D[2] + 0.3], pushK(f, 160, 0.002), { fov: 42 });
-const S2b = (f: number) => dolly([D[0] + 0.5, D0 + 1.6, D[2] - 5.8], [D[0] + 0.3, D0 + 1.1, D[2] + 0.2], pushK(f, 230, 0.002, 0.005, 30), { fov: 38 });
+const S2a = (f: number) => dolly([D[0] + 0.3, D0 + 1.9, D[2] - 7.2], [D[0], D0 + 1.3, D[2] + 0.3], pushK(f, 160, 0.003), { fov: 42 });
+const S2b = (f: number) => dolly([D[0] + 0.5, D0 + 1.6, D[2] - 5.8], [D[0] + 0.3, D0 + 1.1, D[2] + 0.2], pushK(f, 230, 0.003, 0.005, 30), { fov: 38 });
 // shot 3: exam room MS, push on the bent needle, settle on the doctor
-const S3a = (f: number) => dolly([P[0], D0 + 1.9, P[2] - 7.4], [P[0], D0 + 1.3, P[2] + 0.4], pushK(f, 283, 0.002), { fov: 42 });
-const S3b = (f: number) => dolly([P[0] + 0.1, D0 + 1.7, P[2] - 6.2], [P[0] + 0.1, D0 + 1.25, P[2] - 0.2], pushK(f, 330, 0.002, 0.005, 30), { fov: 40 });
+const S3a = (f: number) => dolly([P[0], D0 + 1.9, P[2] - 7.4], [P[0], D0 + 1.3, P[2] + 0.4], pushK(f, 283, 0.003), { fov: 42 });
+const S3b = (f: number) => dolly([P[0] + 0.1, D0 + 1.7, P[2] - 6.2], [P[0] + 0.1, D0 + 1.25, P[2] - 0.2], pushK(f, 330, 0.003, 0.005, 30), { fov: 40 });
 // shot 4: street wide for the fall, push as he stands, tilt down to the cracked asphalt
-const S4a = (f: number) => dolly([S[0] - 0.8, D0 + 2.1, S[2] + 10.0], [S[0], D0 + 1.2, S[2] - 0.4], pushK(f, 431, 0.0016), { fov: 44 });
-const S4b = (f: number) => dolly([S[0] + 0.5, D0 + 1.8, S[2] + 8.2], [S[0] + 0.5, D0 + 1.1, S[2] - 0.4], pushK(f, 490, 0.002, 0.005, 30), { fov: 40 });
-const S4c = (f: number) => dolly([S[0] + 0.8, D0 + 1.5, S[2] + 6.8], [S[0] + 0.6, D0 + 0.7, S[2] - 0.4], pushK(f, 560, 0.002, 0.005, 30), { fov: 38 });
+const S4a = (f: number) => dolly([S[0] - 0.8, D0 + 2.1, S[2] + 10.0], [S[0], D0 + 1.2, S[2] - 0.4], pushK(f, 431, 0.0024), { fov: 44 });
+const S4b = (f: number) => dolly([S[0] + 0.5, D0 + 1.8, S[2] + 8.2], [S[0] + 0.5, D0 + 1.1, S[2] - 0.4], pushK(f, 490, 0.003, 0.005, 30), { fov: 40 });
+const S4c = (f: number) => dolly([S[0] + 0.8, D0 + 1.5, S[2] + 6.8], [S[0] + 0.6, D0 + 0.7, S[2] - 0.4], pushK(f, 560, 0.003, 0.005, 30), { fov: 38 });
 // shot 5: riverbank MS, push on the teeth pop
-const S5a = (f: number) => dolly([G[0] + 0.4, D0 + 1.9, G[2] - 8.2], [G[0] + 0.3, D0 + 1.15, G[2]], pushK(f, 607, 0.002), { fov: 42 });
-const S5b = (f: number) => dolly([G[0] + 0.6, D0 + 1.7, G[2] - 6.8], [G[0] + 0.5, D0 + 1.1, G[2]], pushK(f, 640, 0.002, 0.006, 30), { fov: 40 });
+const S5a = (f: number) => dolly([G[0] + 0.4, D0 + 1.9, G[2] - 8.2], [G[0] + 0.3, D0 + 1.15, G[2]], pushK(f, 607, 0.003), { fov: 42 });
+const S5b = (f: number) => dolly([G[0] + 0.6, D0 + 1.7, G[2] - 6.8], [G[0] + 0.5, D0 + 1.1, G[2]], pushK(f, 640, 0.003, 0.006, 30), { fov: 40 });
 // shot 6: park MS, slight pull as the tree falls, push on the lift
-const S6a = (f: number) => dolly([T[0] - 0.4, D0 + 2.2, T[2] - 9.6], [T[0], D0 + 1.5, T[2]], pushK(f, 743, 0.0016), { fov: 44 });
-const S6b = (f: number) => dolly([T[0] + 0.3, D0 + 1.9, T[2] - 8.2], [T[0] + 0.2, D0 + 1.4, T[2]], pushK(f, 790, 0.002, 0.005, 32), { fov: 40 });
+const S6a = (f: number) => dolly([T[0] - 0.4, D0 + 2.2, T[2] - 9.6], [T[0], D0 + 1.5, T[2]], pushK(f, 743, 0.0024), { fov: 44 });
+const S6b = (f: number) => dolly([T[0] + 0.3, D0 + 1.9, T[2] - 8.2], [T[0] + 0.2, D0 + 1.4, T[2]], pushK(f, 790, 0.003, 0.005, 32), { fov: 40 });
 // shot 7: cage MS through the bars, slow push as the lion retreats
-const S7a = (f: number) => dolly([L[0] - 0.6, D0 + 1.9, L[2] - 8.6], [L[0] + 0.3, D0 + 1.25, L[2]], pushK(f, 892, 0.0018), { fov: 42 });
-const S7b = (f: number) => dolly([L[0] + 0.2, D0 + 1.7, L[2] - 7.2], [L[0] + 0.6, D0 + 1.2, L[2]], pushK(f, 960, 0.002), { fov: 40 });
+const S7a = (f: number) => dolly([L[0] - 0.6, D0 + 1.9, L[2] - 8.6], [L[0] + 0.3, D0 + 1.25, L[2]], pushK(f, 892, 0.0026), { fov: 42 });
+const S7b = (f: number) => dolly([L[0] + 0.2, D0 + 1.7, L[2] - 7.2], [L[0] + 0.6, D0 + 1.2, L[2]], pushK(f, 960, 0.003), { fov: 40 });
 // shot 8: operating room MS, push to the scalpel
-const S8a = (f: number) => dolly([P[0], D0 + 2.0, P[2] - 7.6], [P[0], D0 + 1.35, P[2] + 0.4], pushK(f, 1015, 0.0018), { fov: 42 });
-const S8b = (f: number) => dolly([P[0] + 0.1, D0 + 1.8, P[2] - 6.6], [P[0] + 0.1, D0 + 1.25, P[2] + 0.5], pushK(f, 1140, 0.002, 0.005, 32), { fov: 38 });
+const S8a = (f: number) => dolly([P[0], D0 + 2.0, P[2] - 7.6], [P[0], D0 + 1.35, P[2] + 0.4], pushK(f, 1015, 0.0026), { fov: 42 });
+const S8b = (f: number) => dolly([P[0] + 0.1, D0 + 1.8, P[2] - 6.6], [P[0] + 0.1, D0 + 1.25, P[2] + 0.5], pushK(f, 1140, 0.003, 0.005, 32), { fov: 38 });
+// motion upgrade: mid-shot pan across the long S8 hold (from the hero toward the doctor)
+const S8m = (f: number) => dolly([P[0] - 0.55, D0 + 1.9, P[2] - 7.0], [P[0] - 0.35, D0 + 1.3, P[2] + 0.45], pushK(f, 1080, 0.0026), { fov: 40 });
 // shot 9: same room, push to the tray of broken scalpels, back for the surrender
-const S9a = (f: number) => dolly([P[0] + 0.2, D0 + 1.8, P[2] - 6.4], [P[0] + 0.3, D0 + 1.2, P[2] + 0.3], pushK(f, 1222, 0.002, 0.005, 30), { fov: 40 });
-const S9b = (f: number) => dolly([P[0] - 0.2, D0 + 1.9, P[2] - 7.4], [P[0], D0 + 1.3, P[2] + 0.4], pushK(f, 1290, 0.0018), { fov: 42 });
+const S9a = (f: number) => dolly([P[0] + 0.2, D0 + 1.8, P[2] - 6.4], [P[0] + 0.3, D0 + 1.2, P[2] + 0.3], pushK(f, 1222, 0.003, 0.005, 30), { fov: 40 });
+const S9b = (f: number) => dolly([P[0] - 0.2, D0 + 1.9, P[2] - 7.4], [P[0], D0 + 1.3, P[2] + 0.4], pushK(f, 1290, 0.0026), { fov: 42 });
 // shot 10: house front at dusk, slow crane out to the end (picture moving to the last frame)
-const S10a = (f: number) => dolly([R[0], D0 + 1.9, R[2] - 6.8], [R[0], D0 + 1.35, R[2]], pushK(f, 1371, 0.0012), { fov: 40 });
+const S10a = (f: number) => dolly([R[0], D0 + 1.9, R[2] - 6.8], [R[0], D0 + 1.35, R[2]], pushK(f, 1371, 0.0018), { fov: 40 });
 const S10b = (f: number): Shot => {
   const a = S10a(1470), s = glide((f - 1470) / 98);
   const B: V3 = [R[0] + 5.0, D0 + 6.0, R[2] - 16], L2: V3 = [R[0], D0 + 1.6, R[2] + 1];
@@ -126,7 +128,7 @@ const CAMS: Record<number, Key[]> = {
   5: [{ f: 607, s: S5a }, { f: 640, dur: 28, s: S5b }],
   6: [{ f: 743, s: S6a }, { f: 790, dur: 28, s: S6b }],
   7: [{ f: 892, s: S7a }, { f: 960, dur: 28, s: S7b }],
-  8: [{ f: 1015, s: S8a }, { f: 1140, dur: 28, s: S8b }],
+  8: [{ f: 1015, s: S8a }, { f: 1080, dur: 30, s: S8m }, { f: 1140, dur: 28, s: S8b }],
   9: [{ f: 1222, s: S9a }, { f: 1290, dur: 28, s: S9b }],
   10: [{ f: 1371, s: S10a }, { f: 1470, cut: true, s: S10b }],
 };
@@ -142,7 +144,21 @@ export const kickAt = (t: number) => {
   return a;
 };
 export const camAt = (id: number, f: number): Cam => {
-  const c = run(CAMS[id], f), a = kickAt(f / FPS);
+  let c = run(CAMS[id], f);
+  // motion upgrade: gentle continuous drift so no shot is ever dead still —
+  // slow look sway (pan/tilt breathing) + a micro-orbit of the camera around the look point
+  const t = f / FPS;
+  const swx = Math.sin(t * 0.45 + id * 1.3) * 0.055, swy = Math.sin(t * 0.32 + id * 2.1) * 0.035;
+  const orb = Math.sin(t * 0.21 + id * 1.7) * 0.014; // ~0.8 degree max
+  const dx0 = c.pos[0] - c.look[0], dz0 = c.pos[2] - c.look[2];
+  const co = Math.cos(orb), si = Math.sin(orb);
+  c = {
+    ...c,
+    pos: [c.look[0] + dx0 * co - dz0 * si, c.pos[1] + Math.sin(t * 0.26 + id) * 0.03, c.look[2] + dx0 * si + dz0 * co],
+    look: [c.look[0] + swx, c.look[1] + swy, c.look[2]],
+    roll: c.roll + Math.sin(t * 0.18 + id * 0.7) * 0.004,
+  };
+  const a = kickAt(f / FPS);
   if (!a) return c;
   const d: V3 = [c.look[0] - c.pos[0], c.look[1] - c.pos[1], c.look[2] - c.pos[2]];
   const L = Math.hypot(...d), h = Math.hypot(d[0], d[2]) || 1;

@@ -64,6 +64,15 @@ const crackTex = () => ctex("crackDK", 512, 512, (g) => {
 
 type Mats = Record<string, THREE.Material>;
 
+/** soft round sprite texture for steam / fireflies / glow */
+const softTex = () => ctex("softDot", 128, 128, (g) => {
+  const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+  gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.5, "rgba(255,255,255,0.45)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+});
+const SETS: Record<number, V3> = { 1: STREET, 2: DAPUR, 3: PERIKSA, 4: STREET, 5: SUNGAI, 6: TAMAN, 7: SINGA, 8: PERIKSA, 9: PERIKSA, 10: RUMAH };
+const OUTDOOR = new Set([1, 4, 5, 6, 7, 10]);
+
 export class World {
   root = new THREE.Group();
   private pool = new Pool();
@@ -80,6 +89,14 @@ export class World {
   private motor: THREE.Group;
   private crack: THREE.Mesh;
   private fallTree: THREE.Object3D | null;
+  // ---- motion-upgrade ambient systems ----
+  private birds: THREE.Group[] = [];
+  private leaves: THREE.Mesh[] = [];
+  private steam: THREE.Sprite[] = [];
+  private ripples: THREE.Mesh[] = [];
+  private dust: THREE.Points; private dustBase: Float32Array;
+  private fireflies: THREE.Sprite[] = [];
+  private swayBushes: { obj: THREE.Object3D; shot: number; phase: number }[] = [];
   private frustum = new THREE.Frustum();
   private m4 = new THREE.Matrix4(); private v = new THREE.Vector3(); private sph = new THREE.Sphere();
 
@@ -314,6 +331,82 @@ export class World {
       this.fallTree.visible = false;
       R.add(this.fallTree);
     }
+
+    // ---- motion upgrade: ambient life (all cheap, pure functions of t) ----
+    const soft = softTex();
+    // birds: 4 two-triangle flappers crossing the sky on outdoor shots
+    const birdMat = new THREE.MeshBasicMaterial({ color: "#2e3138", side: THREE.DoubleSide });
+    for (let i = 0; i < 4; i++) {
+      const g = new THREE.Group();
+      const wgeo = new THREE.PlaneGeometry(0.55, 0.16); wgeo.translate(0.27, 0, 0);
+      const wl = new THREE.Mesh(wgeo, birdMat); wl.rotation.y = Math.PI;
+      const wr = new THREE.Mesh(wgeo, birdMat);
+      g.add(wl, wr); g.userData = { wl, wr };
+      g.visible = false; g.layers.set(NOINK); wl.layers.set(NOINK); wr.layers.set(NOINK);
+      this.birds.push(g); R.add(g);
+    }
+    // falling leaves near the trees
+    const leafCols = ["#6fae4e", "#8ab86a", "#d8a04a", "#5d9b45"];
+    for (let i = 0; i < 10; i++) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.17),
+        new THREE.MeshBasicMaterial({ color: leafCols[i % 4], side: THREE.DoubleSide }));
+      m.visible = false; this.leaves.push(m); R.add(m);
+    }
+    // steam over a pot on the dapur stove (shot 2)
+    const pot = new THREE.Group();
+    const potBody = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.18, 0.24, 14), M.steel);
+    potBody.position.y = 0.12; potBody.castShadow = true; pot.add(potBody);
+    const potLid = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.21, 0.05, 14), M.iron);
+    potLid.position.y = 0.27; pot.add(potLid);
+    pot.position.set(D[0] - 0.95, D0 + 0.97, 1.15);
+    R.add(pot);
+    for (let i = 0; i < 5; i++) {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: "#ffffff", transparent: true, opacity: 0, depthWrite: false }));
+      sp.position.set(D[0] - 0.95, D0 + 1.3, 1.15);
+      sp.visible = false; sp.layers.set(NOINK);
+      this.steam.push(sp); R.add(sp);
+    }
+    // ripples on the river (shot 5)
+    for (let i = 0; i < 3; i++) {
+      const m = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.5, 24),
+        new THREE.MeshBasicMaterial({ color: "#dff2ff", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+      m.rotation.x = -Math.PI / 2;
+      m.position.set(G[0] - 2 + i * 2.6, D0 + 0.005, 4.5 + (i % 2) * 2.2);
+      m.visible = false; m.layers.set(NOINK);
+      this.ripples.push(m); R.add(m);
+    }
+    // dust motes drifting in indoor light
+    const ND = 36;
+    this.dustBase = new Float32Array(ND * 3);
+    let dseed = 7; const drnd = () => { dseed = (dseed * 16807) % 2147483647; return dseed / 2147483647; };
+    for (let i = 0; i < ND; i++) {
+      this.dustBase[i * 3] = (drnd() - 0.5) * 7; this.dustBase[i * 3 + 1] = 0.4 + drnd() * 2.8; this.dustBase[i * 3 + 2] = (drnd() - 0.5) * 5;
+    }
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(this.dustBase), 3));
+    this.dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: "#fff3cf", size: 0.045, transparent: true, opacity: 0.5, depthWrite: false }));
+    this.dust.visible = false; this.dust.frustumCulled = false; this.dust.layers.set(NOINK);
+    R.add(this.dust);
+    // fireflies at dusk (shot 10)
+    for (let i = 0; i < 10; i++) {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: soft, color: "#ffe98a", transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      sp.scale.setScalar(0.16); sp.visible = false; sp.layers.set(NOINK);
+      this.fireflies.push(sp); R.add(sp);
+    }
+    // swaying standalone bushes / grass tufts on outdoor sets
+    const swaySpots: [string, number, number, number][] = [
+      ["plant_bush", 5, G[0] - 3.4, 1.5], ["grass_large", 5, G[0] + 3.4, 1.9],
+      ["plant_bush", 6, T[0] + 3.6, 3.2], ["grass_large", 6, T[0] - 3.0, -1.2],
+      ["grass_large", 7, L[0] - 2.2, 2.5], ["plant_bush", 10, Rm[0] + 3.8, 1.2],
+      ["grass_large", 1, S[0] - 6.5, -4.6], ["grass_large", 4, S[0] + 5.5, 4.0],
+    ];
+    swaySpots.forEach(([name, shot, x, z], i) => {
+      const o = kitClone(kit, name, name === "grass_large" ? 0.85 : 1.1);
+      if (!o) return;
+      o.position.set(x, D0, z); o.visible = false;
+      this.swayBushes.push({ obj: o, shot, phase: i * 1.37 });
+      R.add(o);
+    });
   }
 
   /** camera-relative sun, frozen per shot (same approach as molasses) */
@@ -374,8 +467,77 @@ export class World {
     }
     for (let i = 0; i < this.clouds.length; i++) {
       const m = this.clouds[i], mat = m.material as THREE.MeshBasicMaterial;
+      // motion upgrade: clouds drift slowly across the sky
+      if (m.userData.bx === undefined) m.userData.bx = m.position.x;
+      m.position.x = 120 + (((m.userData.bx - 120 + t * 1.6 + 750) % 1500) - 750);
       m.lookAt(cam.position.x, m.position.y, cam.position.z);
       mat.map = this.cloudMaps[s.light][i % 4];
+    }
+    // ---- motion upgrade: ambient life ----
+    const ctr = SETS[id], outdoor = OUTDOOR.has(id);
+    // birds cross the sky on outdoor shots
+    this.birds.forEach((g, i) => {
+      g.visible = outdoor;
+      if (!outdoor) return;
+      const span = 64, u = ((t * 2.6 + i * 17) % span) - span / 2;
+      g.position.set(ctr[0] + u, D0 + 8.5 + (i % 3) * 1.3 + Math.sin(t * 1.1 + i * 2) * 0.35, ctr[2] - 6 - (i % 2) * 3);
+      g.rotation.y = Math.PI / 2;
+      const flap = Math.sin(t * 9 + i * 1.7) * 0.55;
+      (g.userData.wl as THREE.Mesh).rotation.z = flap;
+      (g.userData.wr as THREE.Mesh).rotation.z = -flap;
+    });
+    // falling leaves near the trees (street / taman / rumah)
+    const leafTree: Record<number, [number, number]> = { 1: [STREET[0] - 11, -6], 4: [STREET[0] + 10, -5.5], 6: [TAMAN[0] + 6.5, 5.5], 10: [RUMAH[0] - 6.5, 3] };
+    const lt = leafTree[id];
+    this.leaves.forEach((m, i) => {
+      m.visible = !!lt;
+      if (!lt) return;
+      const u = (t * 0.16 + i * 0.173) % 1;
+      m.position.set(lt[0] + Math.sin(i * 2.4) * 1.4 + Math.sin(t * 0.9 + i * 3.1) * 0.35 + u * 0.8,
+        D0 + 4.4 - u * 4.3, lt[1] + Math.cos(i * 1.9) * 1.2);
+      m.rotation.set(t * (1 + i * 0.13), t * 0.7 + i, Math.sin(t * 1.3 + i) * 0.6);
+    });
+    // steam over the dapur pot (shot 2)
+    this.steam.forEach((sp, i) => {
+      sp.visible = id === 2;
+      if (id !== 2) return;
+      const u = (t * 0.32 + i / 5) % 1;
+      sp.position.set(DAPUR[0] - 0.95 + Math.sin(t * 1.4 + i * 2.2) * 0.06, D0 + 1.3 + u * 0.95, 1.15);
+      sp.scale.setScalar(0.16 + u * 0.5);
+      (sp.material as THREE.SpriteMaterial).opacity = 0.34 * Math.sin(u * Math.PI);
+    });
+    // ripples on the river (shot 5)
+    this.ripples.forEach((m, i) => {
+      m.visible = id === 5;
+      if (id !== 5) return;
+      const u = (t * 0.22 + i / 3) % 1;
+      m.scale.setScalar(0.4 + u * 2.4);
+      (m.material as THREE.MeshBasicMaterial).opacity = 0.45 * (1 - u);
+    });
+    // dust motes indoors
+    this.dust.visible = !outdoor;
+    if (!outdoor) {
+      const pos = this.dust.geometry.getAttribute("position") as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) {
+        pos.setXYZ(i,
+          ctr[0] + this.dustBase[i * 3] + Math.sin(t * 0.24 + i * 1.7) * 0.22,
+          D0 + this.dustBase[i * 3 + 1] + Math.sin(t * 0.17 + i * 2.3) * 0.14,
+          ctr[2] + this.dustBase[i * 3 + 2] + Math.cos(t * 0.2 + i * 1.3) * 0.18);
+      }
+      pos.needsUpdate = true;
+    }
+    // fireflies at dusk (shot 10)
+    this.fireflies.forEach((sp, i) => {
+      sp.visible = id === 10;
+      if (id !== 10) return;
+      sp.position.set(RUMAH[0] - 3 + Math.sin(t * 0.23 + i * 2.6) * 3.4 + i * 0.7,
+        D0 + 0.7 + Math.sin(t * 0.5 + i * 1.9) * 0.45, RUMAH[2] - 1 + Math.cos(t * 0.19 + i * 3.1) * 2.2);
+      (sp.material as THREE.SpriteMaterial).opacity = 0.15 + 0.6 * Math.max(0, Math.sin(t * 1.6 + i * 2.4)) ** 3;
+    });
+    // swaying bushes / grass
+    for (const sb of this.swayBushes) {
+      sb.obj.visible = sb.shot === id;
+      if (sb.shot === id) sb.obj.rotation.z = Math.sin(t * 1.25 + sb.phase) * 0.045;
     }
     // ---- animated props ----
     // kasti ball (shot 1): thrown in from the left, bounces off the hero at f115

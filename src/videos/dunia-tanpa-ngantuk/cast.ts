@@ -133,53 +133,58 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   const out: Stage = { places: [], fx: [] };
   const f = Math.round(t * FPS);
   const blink = (i: number) => lidAt(t, i);
+  // motion upgrade: idle secondary motion for standing/sitting characters (quantized so
+  // canvas redraws stay cheap; the y bob is free — it only moves the placed card)
+  const idleHead = (i: number, amp = 1.4) => q(Math.sin(t * 1.35 + i * 2.1) * amp, 2);
+  const idleBob = (i: number) => Math.sin(t * 1.7 + i * 1.3) * 0.008;
+  const idleLook = (i: number) => q(Math.sin(t * 0.55 + i * 1.9) * 0.6, 4);
 
   if (id === 1) {
     // sitting on the bed edge, eyes wide open (blink forced off), clock spinning on the wall
     const hx = KAMAR[0] - 0.2, hz = KAMAR[2] + 0.6;
-    out.places.push(person(cam, hero, hx, D0 + 0.72, hz, { side: false, mirror: false },
-      { mode: "sit", expr: "smile", blink: 0 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + 0.72 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "sit", expr: "smile", blink: 0, headTilt: idleHead(1, 1.0), look: idleLook(1) }, {}));
     const u = q((t * 0.55) % 1, 24);
     out.fx.push({ key: `clock${u}`, cw: 300, ch: 300, draw: (p) => fxClock(p, u),
       x: KAMAR[0] + 1.5, y: D0 + 2.7, z: KAMAR[2] + 3.85, w: 0.85, h: 0.85 });
   } else if (id === 2) {
     const hx = KAMAR[0] - 0.35, hz = KAMAR[2] - 0.3;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: "smile", blink: blink(1), facing: 1 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: "smile", blink: blink(1), facing: 1, headTilt: idleHead(1), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
     // friend asleep face-down on the desk from f272 (slumps over f260-275)
     const fx2 = KAMAR[0] + 1.1, fz = KAMAR[2] + 0.7;
     const slump = smooth((f - 260) / 15);
-    out.places.push(person(cam, friend, fx2, D0 + 0.45, fz, { side: false, mirror: false },
-      { mode: "sit", expr: slump > 0.5 ? "smile_closed" : "neutral", blink: slump > 0.5 ? 1 : blink(3), headTilt: 6 + slump * 22 }, {}));
+    out.places.push(person(cam, friend, fx2, D0 + 0.45 + (slump > 0.5 ? Math.sin(t * 0.9) * 0.006 : idleBob(3)), fz, { side: false, mirror: false },
+      { mode: "sit", expr: slump > 0.5 ? "smile_closed" : "neutral", blink: slump > 0.5 ? 1 : blink(3), headTilt: 6 + slump * 22 + (slump > 0.5 ? 0 : idleHead(3, 1.0)), look: slump > 0.5 ? 0 : idleLook(3) }, {}));
     if (f >= 275) {
       const u = q((t * 0.5) % 1, 30);
       out.fx.push({ key: `zzz${u}`, cw: 300, ch: 280, draw: (p) => fxZzz(p, u), x: fx2 - 0.05, y: D0 + 1.8, z: fz, w: 0.7, h: 0.65 });
     }
   } else if (id === 3) {
     const hx = TV[0] - 0.1, hz = TV[2] + 0.6;
-    out.places.push(person(cam, hero, hx, D0 + 0.55, hz, { side: false, mirror: false },
-      { mode: "sit", expr: f >= 427 ? "grin" : "smile", blink: 0 }, {})); // eyes glued open the whole marathon
+    out.places.push(person(cam, hero, hx, D0 + 0.55 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "sit", expr: f >= 427 ? "grin" : "smile", blink: 0, headTilt: idleHead(1, 0.9), look: idleLook(1) }, {})); // eyes glued open the whole marathon
   } else if (id === 4) {
     const hx = KANTOR[0] - 0.55, hz = KANTOR[2] + 0.5;
     const typing = Math.sin(t * 9) * 0.012;
     const robot = f >= 579;
     out.places.push(person(cam, hero, hx, D0 + 0.45 + typing, hz, { side: false, mirror: false },
-      { mode: "sit", expr: robot ? "neutral" : "smile", blink: blink(1), tilt: robot ? 0 : 2, headTilt: robot ? 0 : 4 }, {}));
+      { mode: "sit", expr: robot ? "neutral" : "smile", blink: blink(1), tilt: robot ? 0 : 2, headTilt: robot ? 0 : 4 + idleHead(1, 0.9), look: robot ? 0 : idleLook(1) }, {}));
     const bx = KANTOR[0] + 0.95, bz = KANTOR[2] + 0.7;
-    out.places.push(person(cam, boss, bx, D0, bz, { side: false, mirror: false },
-      { mode: "stand", expr: "stern", blink: blink(5), facing: -1, headTilt: f >= 542 ? 6 : 0 }, {}));
+    out.places.push(person(cam, boss, bx, D0 + idleBob(5), bz, { side: false, mirror: false },
+      { mode: "stand", expr: "stern", blink: blink(5), facing: -1, headTilt: (f >= 542 ? 6 : 0) + idleHead(5, 1.0), look: idleLook(5) }, {}));
     blob(out, cam, bx, D0, bz);
   } else if (id === 5) {
     const hx = SATPAM[0] - 0.8, hz = SATPAM[2];
-    out.places.push(person(cam, satpam, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: "smile", blink: 0 }, {})); // never sleeps on duty
+    out.places.push(person(cam, satpam, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: "smile", blink: 0, headTilt: idleHead(1), look: idleLook(1) }, {})); // never sleeps on duty
     blob(out, cam, hx, D0, hz);
     // maling crouched in the bush; yawns, gives up at f740 and walks off
     const mx = SATPAM[0] + malingX(f), mz = SATPAM[2] + 0.35;
     if (f < 740) {
-      out.places.push(person(cam, maling, mx, D0 + 0.1, mz, { side: false, mirror: false },
-        { mode: "sit", expr: f >= 696 ? "dazed" : "neutral", blink: f >= 696 ? 0.7 : blink(7), headTilt: f >= 696 ? 10 : 4 }, {}));
+      out.places.push(person(cam, maling, mx, D0 + 0.1 + idleBob(7), mz, { side: false, mirror: false },
+        { mode: "sit", expr: f >= 696 ? "dazed" : "neutral", blink: f >= 696 ? 0.7 : blink(7), headTilt: (f >= 696 ? 10 : 4) + idleHead(7, 0.9), look: idleLook(7) }, {}));
     } else {
       const view = viewOf(cam, mx, mz, 1, 0);
       const phase = q(((mx - SATPAM[0] - 1.6) / 1.4) % 1, 120);
@@ -207,26 +212,26 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   } else if (id === 7) {
     const hx = DAPUR[0] - 0.5, hz = DAPUR[2] + 0.3;
     const talking = Math.sin(t * 2.2) > 0;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: talking ? "grin" : "smile", blink: blink(1), facing: 1, headTilt: 4 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: talking ? "grin" : "smile", blink: blink(1), facing: 1, headTilt: 4 + idleHead(1, 1.6), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
   } else if (id === 8) {
     const hx = DOKTER[0] - 0.5, hz = DOKTER[2] + 0.4;
     const shrug = f >= 1196;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: shrug ? "grin" : "smile", blink: blink(1), facing: 1, tilt: shrug ? 4 : 0 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: shrug ? "grin" : "smile", blink: blink(1), facing: 1, tilt: shrug ? 4 : 0, headTilt: idleHead(1), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
     const dx = DOKTER[0] + 0.8, dz = DOKTER[2] + 0.6;
     const shake = f >= 1134 ? Math.round(Math.sin((f - 1134) * 0.22) * 7) : 0; // head shake, quantized
-    out.places.push(person(cam, doctor, dx, D0, dz, { side: false, mirror: false },
-      { mode: "stand", expr: f >= 1134 ? "nervous" : "neutral", blink: blink(10), facing: -1, headTilt: shake }, {}));
+    out.places.push(person(cam, doctor, dx, D0 + idleBob(10), dz, { side: false, mirror: false },
+      { mode: "stand", expr: f >= 1134 ? "nervous" : "neutral", blink: blink(10), facing: -1, headTilt: shake + idleHead(10, 0.8), look: idleLook(10) }, {}));
     blob(out, cam, dx, D0, dz);
   } else if (id === 9) {
     // lying on the bed (bed top at D0 + 0.72 in world.ts), phone up, eyes slowly closing at the end
     const hx = KAMAR[0] - 0.2, hz = KAMAR[2] + 0.6;
     const closing = clamp01((f - 1395) / 55); // 0 -> 1, fully closed by f1450
-    out.places.push(person(cam, hero, hx, D0 + 0.72, hz, { side: false, mirror: false },
-      { mode: "fall", expr: "neutral", blink: closing }, {}));
+    out.places.push(person(cam, hero, hx, D0 + 0.72 + Math.sin(t * 0.9) * 0.006, hz, { side: false, mirror: false },
+      { mode: "fall", expr: "neutral", blink: closing }, {})); // slow breathing as he drifts off
     out.places[out.places.length - 1].roll = 1.35; // flat on his back
     const dots = 1 + (Math.floor(t * 1.5) % 3);
     out.fx.push({ key: `phonechat${dots}`, cw: 300, ch: 280, draw: (p) => fxPhoneChat(p, dots),

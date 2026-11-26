@@ -217,6 +217,11 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   const out: Stage = { places: [], fx: [] };
   const f = Math.round(t * FPS);
   const blink = (i: number) => lidAt(t, i);
+  // motion upgrade: idle secondary motion for standing/sitting characters (quantized so
+  // canvas redraws stay cheap; the y bob is free — it only moves the placed card)
+  const idleHead = (i: number, amp = 1.4) => q(Math.sin(t * 1.35 + i * 2.1) * amp, 2);
+  const idleBob = (i: number) => Math.sin(t * 1.7 + i * 1.3) * 0.008;
+  const idleLook = (i: number) => q(Math.sin(t * 0.55 + i * 1.9) * 0.6, 4);
   const stars = (x: number, y: number, z: number, i: number) => {
     const u = q((t * 0.9 + hh(i, 5)) % 1, 30);
     out.fx.push({ key: `stars${u}`, cw: 420, ch: 210, draw: (p) => fxStars(p, u), x, y, z, w: 0.75, h: 0.375 });
@@ -235,8 +240,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   } else if (id === 2) {
     const hx = DAPUR[0] + 0.1, hz = DAPUR[2] + 0.25;
     const dull = f >= 250;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: dull ? "smile" : "neutral", blink: blink(1), headTilt: f >= 188 ? 6 : 0 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: dull ? "smile" : "neutral", blink: blink(1), headTilt: (f >= 188 ? 6 : 0) + idleHead(1), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
     // knife in hand: slips down + rotates f188-210, then held up dull
     const slip = smooth((f - 188) / 22);
@@ -245,13 +250,13 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
       x: hx + 0.42, y: ky, z: hz - 0.1, w: 0.55, h: 0.55, rot: -0.5 - slip * 0.5 + (dull ? 0.4 : 0) });
   } else if (id === 3) {
     const hx = PERIKSA[0] - 0.75, hz = PERIKSA[2] - 0.55;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: "smile", blink: blink(1), facing: 1 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: "smile", blink: blink(1), facing: 1, headTilt: idleHead(1), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
     const dx = PERIKSA[0] + 0.85, dz = PERIKSA[2] - 0.35;
     const dexpr: Expr = f < 350 ? "neutral" : f < 397 ? "shock" : "nervous";
-    out.places.push(person(cam, doctor, dx, D0, dz, { side: false, mirror: false },
-      { mode: "stand", expr: dexpr, blink: blink(10), facing: -1, headTilt: f >= 397 ? 8 : 0 }, {}));
+    out.places.push(person(cam, doctor, dx, D0 + idleBob(10), dz, { side: false, mirror: false },
+      { mode: "stand", expr: dexpr, blink: blink(10), facing: -1, headTilt: (f >= 397 ? 8 : 0) + idleHead(10, 1.0), look: idleLook(10) }, {}));
     blob(out, cam, dx, D0, dz);
     const bent = f >= 350;
     out.fx.push({ key: `syringe${bent ? "b" : "s"}`, cw: 300, ch: 300, draw: (p) => fxSyringe(p, bent),
@@ -279,15 +284,15 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
       if (u < 1) out.fx.push({ key: `landpuff${u}`, cw: 300, ch: 300, draw: (p) => fxPuff(p, u), x, y: D0 + 0.4, z: hz, w: 1.3, h: 0.9, soft: true });
     } else {
       const x = STREET[0] + fallX4(f);
-      out.places.push(person(cam, hero, x, D0, hz, { side: false, mirror: false },
-        { mode: "stand", expr: "smile", blink: blink(1) }, {}));
+      out.places.push(person(cam, hero, x, D0 + idleBob(1), hz, { side: false, mirror: false },
+        { mode: "stand", expr: "smile", blink: blink(1), headTilt: idleHead(1), look: idleLook(1) }, {}));
       blob(out, cam, x, D0, hz);
     }
   } else if (id === 5) {
     const hx = SUNGAI[0] - 0.6, hz = SUNGAI[2];
     const bitten = f >= 613 && f < 706;
-    out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-      { mode: "stand", expr: f >= 655 ? "grin" : "smile", blink: blink(1), facing: 1, tilt: bitten ? 3 : 0 }, {}));
+    out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "stand", expr: f >= 655 ? "grin" : "smile", blink: blink(1), facing: 1, tilt: bitten ? 3 : 0, headTilt: idleHead(1), look: idleLook(1) }, {}));
     blob(out, cam, hx, D0, hz);
     const cx = SUNGAI[0] + crocX(f), cz = SUNGAI[2] + 0.35;
     const teeth = f < 655;
@@ -302,8 +307,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   } else if (id === 6) {
     const hx = TAMAN[0], hz = TAMAN[2];
     if (f < 775) {
-      out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-        { mode: "stand", expr: "smile", blink: blink(1) }, {}));
+      out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+        { mode: "stand", expr: "smile", blink: blink(1), headTilt: idleHead(1), look: idleLook(1) }, {}));
       blob(out, cam, hx, D0, hz);
     } else if (f < 799) {
       // flattened under the tree
@@ -314,8 +319,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
     } else {
       // lifts the tree onto his shoulder, then holds it like a broom
       const lift = smooth((f - 799) / 48);
-      out.places.push(person(cam, hero, hx, D0, hz, { side: false, mirror: false },
-        { mode: "stand", expr: "grin", blink: blink(1), tilt: -4 * (1 - lift) }, {}));
+      out.places.push(person(cam, hero, hx, D0 + idleBob(1), hz, { side: false, mirror: false },
+        { mode: "stand", expr: "grin", blink: blink(1), tilt: -4 * (1 - lift), headTilt: idleHead(1, 0.8), look: idleLook(1) }, {}));
       blob(out, cam, hx, D0, hz);
     }
   } else if (id === 7) {
@@ -325,8 +330,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
     const walking = f < 940;
     const view = viewOf(cam, hx, hz, 1, 0);
     const phase = q(((hx - SINGA[0] + 2.6) / 1.4) % 1, 120);
-    out.places.push(person(cam, hero, hx, D0, hz, view,
-      { phase, mode: walking ? "march" : "stand", expr: f >= 973 ? "grin" : "smile", blink: blink(1) },
+    out.places.push(person(cam, hero, hx, D0 + (walking ? 0 : idleBob(1)), hz, view,
+      { phase, mode: walking ? "march" : "stand", expr: f >= 973 ? "grin" : "smile", blink: blink(1), headTilt: walking ? 0 : idleHead(1), look: walking ? 0 : idleLook(1) },
       { phase, mode: walking ? "march" : "stand", expr: f >= 973 ? "grin" : "smile", blink: blink(1), stomp: 0.9, stride: view.fs }));
     blob(out, cam, hx, D0, hz);
     if (f >= 928) out.fx.push({ key: "phone", cw: 300, ch: 280, draw: fxPhone, x: hx + 0.42, y: D0 + 1.15, z: hz - 0.05, w: 0.36, h: 0.34, rot: -0.08 });
@@ -342,18 +347,18 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
     out.places[out.places.length - 1].roll = 1.35; // flat on his back on the table
     const dx = PERIKSA[0] - 0.3, dz = PERIKSA[2] + 1.15;
     const snapped = f >= 1190;
-    out.places.push(person(cam, doctor, dx, D0, dz, { side: false, mirror: false },
-      { mode: "stand", expr: snapped ? "shock" : "neutral", blink: blink(10), facing: -1, headTilt: 6 }, {}));
+    out.places.push(person(cam, doctor, dx, D0 + idleBob(10), dz, { side: false, mirror: false },
+      { mode: "stand", expr: snapped ? "shock" : "neutral", blink: blink(10), facing: -1, headTilt: 6 + idleHead(10, 1.0), look: idleLook(10) }, {}));
     blob(out, cam, dx, D0, dz);
     out.fx.push({ key: `scalpel${snapped ? "b" : "w"}`, cw: 300, ch: 300, draw: (p) => fxScalpel(p, snapped),
       x: PERIKSA[0] - 0.1, y: D0 + 1.38, z: hz + 0.15, w: 0.5, h: 0.5, rot: -0.3 });
   } else if (id === 9) {
     const hx = PERIKSA[0] - 0.2, hz = PERIKSA[2] + 0.4;
-    out.places.push(person(cam, hero, hx, D0 + 0.95, hz, { side: false, mirror: false },
-      { mode: "sit", expr: f >= 1304 ? "grin" : "smile", blink: blink(1) }, {}));
+    out.places.push(person(cam, hero, hx, D0 + 0.95 + idleBob(1), hz, { side: false, mirror: false },
+      { mode: "sit", expr: f >= 1304 ? "grin" : "smile", blink: blink(1), headTilt: idleHead(1), look: idleLook(1) }, {}));
     const dx = PERIKSA[0] + 1.05, dz = PERIKSA[2] + 0.7;
-    out.places.push(person(cam, doctor, dx, D0, dz, { side: false, mirror: false },
-      { mode: "stand", expr: f >= 1288 ? "nervous" : "shock", blink: blink(10), facing: -1, tilt: f >= 1288 ? 4 : 0, headTilt: f >= 1288 ? 10 : 0 }, {}));
+    out.places.push(person(cam, doctor, dx, D0 + idleBob(10), dz, { side: false, mirror: false },
+      { mode: "stand", expr: f >= 1288 ? "nervous" : "shock", blink: blink(10), facing: -1, tilt: f >= 1288 ? 4 : 0, headTilt: (f >= 1288 ? 10 : 0) + idleHead(10, 1.0), look: idleLook(10) }, {}));
     blob(out, cam, dx, D0, dz);
     out.fx.push({ key: "tray", cw: 300, ch: 260, draw: fxTray, x: dx - 0.45, y: D0 + 1.05, z: dz - 0.1, w: 0.62, h: 0.54 });
   } else if (id === 10) {
@@ -364,13 +369,15 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
     const down = f >= 1477;
     const view = viewOf(cam, hx, hz, 1, 0);
     const phase = q(((hx - RUMAH[0] + 3.2) / 1.4) % 1, 120);
-    out.places.push(person(cam, hero, hx, D0, hz, view,
-      { phase, mode: walking ? "march" : "stand", expr: down ? "dazed" : "smile", blink: blink(1), headTilt: down ? 12 : 0 },
+    out.places.push(person(cam, hero, hx, D0 + (walking ? 0 : idleBob(1)), hz, view,
+      { phase, mode: walking ? "march" : "stand", expr: down ? "dazed" : "smile", blink: blink(1), headTilt: (down ? 12 : 0) + (walking ? 0 : idleHead(1, 0.8)), look: walking ? 0 : idleLook(1) },
       { phase, mode: walking ? "march" : "stand", expr: down ? "dazed" : "smile", blink: blink(1), stomp: 0.9, stride: view.fs }));
     blob(out, cam, hx, D0, hz);
     const ix = RUMAH[0] + 1.0;
-    out.places.push(person(cam, ibu, ix, D0, hz + 0.3, { side: false, mirror: false },
-      { mode: "stand", expr: "stern", blink: blink(20), facing: -1 }, {}));
+    // ibu scolds: gentle raised-arm gesture while she talks (the punchline beat)
+    const scold = f >= 1477 ? q(0.55 + Math.sin(t * 2.6) * 0.3, 6) : undefined;
+    out.places.push(person(cam, ibu, ix, D0 + idleBob(20), hz + 0.3, { side: false, mirror: false },
+      { mode: "stand", expr: "stern", blink: blink(20), facing: -1, headTilt: idleHead(20, 1.0), look: idleLook(20), wave: scold }, {}));
     blob(out, cam, ix, D0, hz + 0.3);
   }
   return out;
