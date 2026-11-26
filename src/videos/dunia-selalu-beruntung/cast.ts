@@ -185,7 +185,7 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
     if (f >= 95) { // the banknote: on the ground, then lifted into his hand at "uang" (f123)
       const lift = smooth((f - 123) / 18);
       out.fx.push({ key: "money", cw: 300, ch: 280, draw: (p) => fxMoney(p),
-        x: hx + 0.55, y: D0 + 0.16 + lift * 0.75, z: JALAN[2] - 0.1, w: 0.42, h: 0.39, rot: -0.08 + lift * 0.1, flat: lift < 0.5 });
+        x: hx + 0.55, y: D0 + 0.25 + lift * 0.6, z: JALAN[2] - 0.1, w: 0.42, h: 0.39, rot: -0.08 + lift * 0.1 });
     }
     if (f >= 171 && f < 215) stars(hx + 0.2, D0 + 2.1, JALAN[2], 4); // raffle win sparkle
     if (f >= 230) { // a passerby shares an umbrella when the drizzle starts
@@ -195,7 +195,7 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
       blob(out, cam, px, D0, JALAN[2] + 0.15);
       const u = q((t * 0.6) % 1, 24);
       out.fx.push({ key: `umbopen${u}`, cw: 300, ch: 280, draw: (p) => fxUmbrellaOpen(p, u),
-        x: px - 0.35, y: D0 + 2.35, z: JALAN[2] + 0.1, w: 1.5, h: 1.4, rot: 0.06 });
+        x: px - 0.5, y: D0 + 2.35, z: JALAN[2] + 0.1, w: 1.5, h: 1.4, rot: 0.06 });
     }
   } else if (id === 2) {
     // office: hero presents a messy chart; the boss loves it; hero is late but so is the meeting
@@ -205,7 +205,7 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
         headTilt: idleHead(1, 0.9), look: 0.6, wave: f >= 326 && f < 392 ? q(0.35 + Math.sin(t * 2.2) * 0.1, 6) : undefined }, {}));
     blob(out, cam, hx, D0, hz);
     out.fx.push({ key: "board", cw: 300, ch: 280, draw: (p) => fxBoard(p),
-      x: hx - 0.95, y: D0 + 1.75, z: hz + 0.35, w: 1.25, h: 1.17, rot: 0.02 });
+      x: hx - 0.15, y: D0 + 1.9, z: hz + 0.55, w: 1.25, h: 1.17, rot: 0.02 });
     const bx = KANTOR[0] + 1.15, bz = KANTOR[2] + 1.5;
     out.places.push(person(cam, bos, bx, D0 + 0.5 + idleBob(5), bz, { side: false, mirror: false },
       { mode: "sit", expr: f >= 392 ? "grin" : "stern", blink: blink(5),
@@ -218,12 +218,12 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
       { mode: "sit", expr: f >= 721 ? "grin" : f >= 596 ? "nervous" : "smile", blink: blink(1),
         headTilt: idleHead(1, 0.9), look: idleLook(1) }, {}));
     if (f >= 721) out.fx.push({ key: "cards", cw: 300, ch: 280, draw: (p) => fxCards(p),
-      x: hx + 0.42, y: D0 + 1.2, z: hz - 0.2, w: 0.5, h: 0.47, rot: -0.05 });
-    const tx = KAFE[0] - 1.0 - jr, tz = KAFE[2] + 1.15;
+      x: hx + 0.38, y: D0 + 1.15, z: hz - 0.2, w: 0.58, h: 0.54, rot: -0.05 });
+    const tx = KAFE[0] - 0.85 - jr, tz = KAFE[2] + 1.15;
     out.places.push(person(cam, teman, tx, D0 + 0.5 + idleBob(3), tz, { side: false, mirror: false },
       { mode: "sit", expr: f >= 721 ? "dazed" : f >= 596 ? "nervous" : "smile", blink: blink(3),
         headTilt: (f >= 721 ? q(Math.sin(t * 2.4) * 4, 2) : idleHead(3, 0.9)), look: f >= 596 ? -0.8 : 0.4 }, {}));
-    const fx2 = KAFE[0] + 1.25 + jr, fz2 = KAFE[2] + 1.05;
+    const fx2 = KAFE[0] + 1.05 + jr, fz2 = KAFE[2] + 1.05;
     out.places.push(person(cam, folk(3), fx2, D0 + 0.5 + idleBob(33), fz2, { side: false, mirror: false },
       { mode: "sit", expr: f >= 721 ? "dazed" : "neutral", blink: blink(33),
         headTilt: (f >= 721 ? q(Math.sin(t * 2.1 + 1) * 4, 2) : idleHead(33, 0.9)), look: f >= 596 ? 0.8 : -0.4 }, {}, 0.95));
@@ -234,8 +234,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
       { mode: "sit", expr: f >= 913 ? "dazed" : f >= 848 ? "nervous" : "neutral", blink: blink(1),
         headTilt: 9 + idleHead(1, 0.7), look: f >= 848 && f < 905 ? 0.8 : idleLook(1) }, {}));
     out.fx.push({ key: "plate", cw: 300, ch: 280, draw: (p) => fxPlate(p),
-      x: hx + 0.1, y: D0 + 0.78, z: hz - 0.35, w: 0.55, h: 0.51, rot: 0.03 });
-    const bg: [Who, number, number, number][] = [[folk(0), 1.5, 1.9, 30], [folk(4), 2.3, 1.75, 34], [folk(5), 3.1, 1.95, 35]];
+      x: hx + 0.1, y: D0 + 0.78, z: hz - 0.35, w: 0.65, h: 0.6, rot: 0.03 });
+    const bg: [Who, number, number, number][] = [[folk(0), 1.0, 1.9, 30], [folk(4), 1.65, 1.75, 34], [folk(5), 2.25, 1.95, 35]];
     for (const [who, ox, oz, i] of bg)
       out.places.push(person(cam, who, KANTIN[0] + ox, D0 + 0.5 + idleBob(i), KANTIN[2] + oz, { side: false, mirror: false },
         { mode: "sit", expr: "laugh", blink: blink(i), headTilt: idleHead(i, 1.6), look: idleLook(i) }, {}, 0.9));
@@ -247,9 +247,9 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
         headTilt: idleHead(1, 0.9), look: 0.4,
         wave: f >= 1043 && f < 1127 ? q(0.3 + Math.sin(t * 1.8) * 0.08, 6) : undefined }, {}));
     out.fx.push({ key: "quiz", cw: 300, ch: 280, draw: (p) => fxQuiz(p),
-      x: hx + 0.5, y: D0 + 1.25, z: hz - 0.15, w: 0.44, h: 0.41, rot: -0.04 });
+      x: hx + 0.42, y: D0 + 1.25, z: hz - 0.15, w: 0.44, h: 0.41, rot: -0.04 });
     if (f >= 1127 && f < 1173) stars(hx + 0.3, D0 + 2.2, hz, 7);
-    const tx = KAFE[0] + 1.25, tz = KAFE[2] + 1.05;
+    const tx = KAFE[0] + 1.05, tz = KAFE[2] + 1.05;
     out.places.push(person(cam, teman, tx, D0 + 0.5 + idleBob(3), tz, { side: false, mirror: false },
       { mode: "sit", expr: f >= 1127 ? "dazed" : "neutral", blink: blink(3),
         headTilt: (f >= 1141 ? q(Math.sin(t * 3.0) * 5, 2) : idleHead(3, 0.9)), look: -0.5 }, {}));
@@ -263,8 +263,8 @@ export const stage = (id: number, t: number, cam: CamInfo): Stage => {
   } else if (id === 7 || id === 8 || id === 9 || id === 10) {
     // kitchen: ibu cooks at the stove (right), hero comes in (left) and tells his story;
     // ibu's words always win the argument
-    const ix = DAPUR[0] + 1.35, iz = DAPUR[2] + 2.55;
-    const hx = DAPUR[0] + (id === 7 ? heroX7(f) : -1.2), hz = DAPUR[2] + 0.95;
+    const ix = DAPUR[0] + 1.0, iz = DAPUR[2] + 2.55;
+    const hx = DAPUR[0] + (id === 7 ? heroX7(f) : -0.7), hz = DAPUR[2] + 0.95;
     const ngomel = (id === 8 && f >= 1646) || (id === 9 && f >= 1834) || id === 10;
     out.places.push(person(cam, ibu, ix, D0 + idleBob(20), iz, { side: false, mirror: false },
       { mode: "stand", expr: ngomel ? "stern" : id === 7 ? "neutral" : "smile", blink: blink(20),

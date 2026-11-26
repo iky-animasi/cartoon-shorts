@@ -70,13 +70,13 @@ const dolly = (pos: V3, look: V3, k: number, rest: Partial<Cam> = {}): Shot =>
 // hero x in shot 1: walks +x, stops at the money (f107), stays for the umbrella beat
 export const heroX1 = (f: number) => (f < 107 ? -2.4 + (f / 107) * 2.2 : -0.2);
 // umbrella friend x in shot 1: enters from the right when the drizzle starts
-export const payungX1 = (f: number) => (f < 230 ? 4.2 : 4.2 - smooth((f - 230) / 45) * 3.1);
+export const payungX1 = (f: number) => (f < 230 ? 4.2 : 4.2 - smooth((f - 230) / 45) * 3.45);
 // hero x in shot 6: slow lonely walk home at dusk
 export const heroX6 = (f: number) => -2.2 + ((f - 1173) / 215) * 3.4;
 // hero x in shot 7: comes in through the kitchen door (left) and stops mid-room
-export const heroX7 = (f: number) => (f < 1402 ? -3.4 : -3.4 + smooth((f - 1402) / 55) * 2.2);
+export const heroX7 = (f: number) => (f < 1402 ? -3.4 : -3.4 + smooth((f - 1402) / 55) * 2.7);
 // card friends in shot 3: slide their chairs away from the hero at "jaga jarak" (f596)
-export const jarak3 = (f: number) => (f < 596 ? 0 : smooth((f - 596) / 30) * 0.4);
+export const jarak3 = (f: number) => (f < 596 ? 0 : smooth((f - 596) / 30) * 0.35);
 
 const J = JALAN, O = KANTOR, C = KAFE, N = KANTIN, S = SORE, D = DAPUR;
 // shot 1: street MS following the hero, punch on "nemu uang" f107
@@ -86,29 +86,29 @@ const S1b = (f: number) => dolly([J[0] + 0.4, D0 + 1.7, J[2] + 7.4], [J[0] + 0.3
 const S2a = (f: number) => dolly([O[0] + 0.2, D0 + 1.9, O[2] - 7.6], [O[0] + 0.1, D0 + 1.3, O[2] + 0.3], pushK(f, 305, 0.002), { fov: 42 });
 const S2b = (f: number) => dolly([O[0] + 0.3, D0 + 1.7, O[2] - 6.6], [O[0] + 0.15, D0 + 1.25, O[2] + 0.2], pushK(f, 385, 0.002, 0.004, 30), { fov: 42 });
 // shot 3: cafe card table MS, punch on "selalu menang" f721
-const S3a = (f: number) => dolly([C[0] + 0.2, D0 + 1.9, C[2] - 7.8], [C[0] + 0.1, D0 + 1.2, C[2] + 0.2], pushK(f, 535, 0.002), { fov: 42 });
-const S3b = (f: number) => dolly([C[0] + 0.3, D0 + 1.7, C[2] - 6.8], [C[0] + 0.1, D0 + 1.15, C[2] + 0.2], pushK(f, 715, 0.002, 0.004, 30), { fov: 42 });
+const S3a = (f: number) => dolly([C[0] + 0.2, D0 + 1.9, C[2] - 8.4], [C[0] + 0.1, D0 + 1.2, C[2] + 0.2], pushK(f, 535, 0.0012), { fov: 44 });
+const S3b = (f: number) => dolly([C[0] + 0.3, D0 + 1.7, C[2] - 7.6], [C[0] + 0.1, D0 + 1.15, C[2] + 0.2], pushK(f, 715, 0.0012, 0.003, 30), { fov: 44 });
 // shot 4: canteen, hero alone in front, laughing table behind; punch on "capek kalah" f913
-const S4a = (f: number) => dolly([N[0] - 0.3, D0 + 1.9, N[2] - 7.8], [N[0] + 0.2, D0 + 1.2, N[2] + 0.3], pushK(f, 755, 0.002), { fov: 42 });
-const S4b = (f: number) => dolly([N[0] + 0.1, D0 + 1.7, N[2] - 6.8], [N[0] + 0.2, D0 + 1.15, N[2] + 0.3], pushK(f, 905, 0.002, 0.004, 30), { fov: 42 });
+const S4a = (f: number) => dolly([N[0] - 0.1, D0 + 1.9, N[2] - 8.4], [N[0] + 0.35, D0 + 1.2, N[2] + 0.3], pushK(f, 755, 0.0012), { fov: 44 });
+const S4b = (f: number) => dolly([N[0] + 0.2, D0 + 1.7, N[2] - 7.6], [N[0] + 0.35, D0 + 1.15, N[2] + 0.3], pushK(f, 905, 0.0012, 0.003, 30), { fov: 44 });
 // shot 5: cafe quiz MS, punch on "tetap aja menang" f1127
-const S5a = (f: number) => dolly([C[0] + 0.1, D0 + 1.9, C[2] - 7.6], [C[0] + 0.1, D0 + 1.2, C[2] + 0.2], pushK(f, 943, 0.002), { fov: 42 });
-const S5b = (f: number) => dolly([C[0] + 0.25, D0 + 1.7, C[2] - 6.6], [C[0] + 0.15, D0 + 1.15, C[2] + 0.2], pushK(f, 1120, 0.002, 0.004, 30), { fov: 42 });
+const S5a = (f: number) => dolly([C[0] + 0.1, D0 + 1.9, C[2] - 8.2], [C[0] + 0.15, D0 + 1.2, C[2] + 0.2], pushK(f, 943, 0.0012), { fov: 44 });
+const S5b = (f: number) => dolly([C[0] + 0.25, D0 + 1.7, C[2] - 7.4], [C[0] + 0.15, D0 + 1.15, C[2] + 0.2], pushK(f, 1120, 0.0012, 0.003, 30), { fov: 44 });
 // shot 6: dusk street, slow crane following the lonely walk
 const S6a = (f: number) => dolly([S[0] - 0.5, D0 + 2.0, S[2] + 9.0], [S[0] - 0.3, D0 + 1.3, S[2]], pushK(f, 1173, 0.0018), { fov: 44 });
 const S6b = (f: number) => dolly([S[0] + 0.5, D0 + 1.8, S[2] + 7.8], [S[0] + 0.4, D0 + 1.25, S[2]], pushK(f, 1245, 0.0018, 0.0035, 30), { fov: 42 });
 // shot 7: kitchen MS, ibu at the stove, hero enters; punch on "kenapa pulang cepet" f1496
-const S7a = (f: number) => dolly([D[0] + 0.2, D0 + 1.9, D[2] - 7.8], [D[0] + 0.3, D[1] + 1.3, D[2] + 0.3], pushK(f, 1388, 0.002), { fov: 42 });
-const S7b = (f: number) => dolly([D[0] + 0.35, D0 + 1.7, D[2] - 6.8], [D[0] + 0.4, D[1] + 1.25, D[2] + 0.3], pushK(f, 1490, 0.002, 0.004, 30), { fov: 42 });
+const S7a = (f: number) => dolly([D[0] + 0.1, D0 + 1.9, D[2] - 8.2], [D[0] + 0.15, D[1] + 1.3, D[2] + 0.3], pushK(f, 1388, 0.0012), { fov: 44 });
+const S7b = (f: number) => dolly([D[0] + 0.2, D0 + 1.7, D[2] - 7.4], [D[0] + 0.15, D[1] + 1.25, D[2] + 0.3], pushK(f, 1490, 0.0012, 0.003, 30), { fov: 44 });
 // shot 8: kitchen two-shot, punch on "makanya jangan sombong" f1646
-const S8a = (f: number) => dolly([D[0] + 0.1, D0 + 1.85, D[2] - 7.4], [D[0] + 0.3, D[1] + 1.28, D[2] + 0.3], pushK(f, 1543, 0.002), { fov: 42 });
-const S8b = (f: number) => dolly([D[0] + 0.3, D0 + 1.7, D[2] - 6.5], [D[0] + 0.45, D[1] + 1.22, D[2] + 0.3], pushK(f, 1640, 0.002, 0.004, 30), { fov: 42 });
+const S8a = (f: number) => dolly([D[0] + 0.1, D0 + 1.85, D[2] - 8.0], [D[0] + 0.15, D[1] + 1.28, D[2] + 0.3], pushK(f, 1543, 0.0012), { fov: 44 });
+const S8b = (f: number) => dolly([D[0] + 0.2, D0 + 1.7, D[2] - 7.2], [D[0] + 0.2, D[1] + 1.22, D[2] + 0.3], pushK(f, 1640, 0.0012, 0.003, 30), { fov: 44 });
 // shot 9: kitchen, hero tries to answer and loses; punch on "kata-kata ibu" f1882
-const S9a = (f: number) => dolly([D[0] + 0.15, D0 + 1.85, D[2] - 7.2], [D[0] + 0.3, D[1] + 1.28, D[2] + 0.3], pushK(f, 1721, 0.002), { fov: 42 });
-const S9b = (f: number) => dolly([D[0] + 0.3, D0 + 1.7, D[2] - 6.4], [D[0] + 0.4, D[1] + 1.22, D[2] + 0.3], pushK(f, 1875, 0.002, 0.004, 30), { fov: 42 });
+const S9a = (f: number) => dolly([D[0] + 0.1, D0 + 1.85, D[2] - 7.8], [D[0] + 0.15, D[1] + 1.28, D[2] + 0.3], pushK(f, 1721, 0.0012), { fov: 44 });
+const S9b = (f: number) => dolly([D[0] + 0.2, D0 + 1.7, D[2] - 7.1], [D[0] + 0.2, D[1] + 1.22, D[2] + 0.3], pushK(f, 1875, 0.0012, 0.003, 30), { fov: 44 });
 // shot 10: punchline, slow push to the last frame (picture keeps moving)
-const S10a = (f: number) => dolly([D[0] + 0.2, D0 + 1.85, D[2] - 7.0], [D[0] + 0.35, D[1] + 1.28, D[2] + 0.3], pushK(f, 1955, 0.0016), { fov: 42 });
-const S10b = (f: number) => dolly([D[0] + 0.35, D0 + 1.75, D[2] - 6.2], [D[0] + 0.45, D[1] + 1.24, D[2] + 0.3], pushK(f, 2128, 0.0018, 0.004, 30), { fov: 40 });
+const S10a = (f: number) => dolly([D[0] + 0.15, D0 + 1.85, D[2] - 7.6], [D[0] + 0.2, D[1] + 1.28, D[2] + 0.3], pushK(f, 1955, 0.001), { fov: 44 });
+const S10b = (f: number) => dolly([D[0] + 0.25, D0 + 1.75, D[2] - 6.9], [D[0] + 0.25, D[1] + 1.24, D[2] + 0.3], pushK(f, 2128, 0.0012, 0.003, 30), { fov: 42 });
 
 const CAMS: Record<number, Key[]> = {
   1: [{ f: 0, s: S1a }, { f: 100, dur: 28, s: S1b }],

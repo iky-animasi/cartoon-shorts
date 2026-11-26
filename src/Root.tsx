@@ -7,6 +7,8 @@ import { DuniaTanpaNgantuk, DTN_FRAMES } from "./videos/dunia-tanpa-ngantuk/Duni
 import { DuniaTanpaBohong, DTB_FRAMES } from "./videos/dunia-tanpa-bohong/DuniaTanpaBohong";
 import { DuniaBisaTerbang, DBT_FRAMES } from "./videos/dunia-bisa-terbang/DuniaBisaTerbang";
 import { DuniaSelaluBeruntung, DSB_FRAMES } from "./videos/dunia-selalu-beruntung/DuniaSelaluBeruntung";
+import { DuniaBacaPikiran, DBP_FRAMES } from "./videos/dunia-baca-pikiran/DuniaBacaPikiran";
+import { DuniaTanpaMakan, DTM_FRAMES } from "./videos/dunia-tanpa-makan/DuniaTanpaMakan";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -63,6 +65,22 @@ export const RemotionRoot: React.FC = () => {
         id="DuniaSelaluBeruntung"
         component={DuniaSelaluBeruntung}
         durationInFrames={DSB_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="DuniaBacaPikiran"
+        component={DuniaBacaPikiran}
+        durationInFrames={DBP_FRAMES}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="DuniaTanpaMakan"
+        component={DuniaTanpaMakan}
+        durationInFrames={DTM_FRAMES}
         fps={30}
         width={1080}
         height={1920}

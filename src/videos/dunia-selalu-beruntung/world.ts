@@ -175,10 +175,10 @@ export class World {
     b.add(boxGeo(V(O[0] + 0.9, D0 + 0.5, 1.62), V(O[0] + 1.4, D0 + 1.05, 1.7)), M.black);
     for (const [lx, lz] of [[0.95, 1.35], [1.29, 1.35], [0.95, 1.59], [1.29, 1.59]] as const)
       b.add(boxGeo(V(O[0] + lx, D0, lz), V(O[0] + lx + 0.06, D0 + 0.44, lz + 0.06)), M.iron);
-    // easel for the hero's presentation board (board fx card sits on the tray at D0 + 1.1)
-    b.add(boxGeo(V(O[0] - 2.3, D0, 0.9), V(O[0] - 2.22, D0 + 1.9, 0.98)), M.darkWood);
-    b.add(boxGeo(V(O[0] - 1.48, D0, 0.9), V(O[0] - 1.4, D0 + 1.9, 0.98)), M.darkWood);
-    b.add(boxGeo(V(O[0] - 2.35, D0 + 1.05, 0.88), V(O[0] - 1.35, D0 + 1.12, 1.0)), M.darkWood);
+    // easel for the hero's presentation board (board fx card sits on the tray at D0 + 1.28)
+    b.add(boxGeo(V(O[0] - 1.5, D0, 1.05), V(O[0] - 1.42, D0 + 1.9, 1.13)), M.darkWood);
+    b.add(boxGeo(V(O[0] - 0.68, D0, 1.05), V(O[0] - 0.6, D0 + 1.9, 1.13)), M.darkWood);
+    b.add(boxGeo(V(O[0] - 1.55, D0 + 1.22, 1.02), V(O[0] - 0.55, D0 + 1.3, 1.16)), M.darkWood);
     // side desk + monitor + keyboard
     b.add(boxGeo(V(O[0] - 2.6, D0 + 0.72, 1.2), V(O[0] - 0.8, D0 + 0.78, 2.0)), M.wood);
     for (const [lx, lz] of [[-2.45, 1.35], [-0.95, 1.35], [-2.45, 1.85], [-0.95, 1.85]] as const)
@@ -220,7 +220,7 @@ export class World {
       for (const [lx, lz] of [[-0.2, -0.2], [0.14, -0.2], [-0.2, 0.14], [0.14, 0.14]] as const)
         b.add(boxGeo(V(C[0] + cx + lx, D0, cz + lz), V(C[0] + cx + lx + 0.06, D0 + 0.44, cz + lz + 0.06)), M.darkWood);
     };
-    cafeTable(0.1, 1.3); cafeChair(0.1, 1.1); cafeChair(-1.15, 1.15); cafeChair(1.4, 1.05);
+    cafeTable(0.1, 1.3); cafeChair(0.1, 1.1); cafeChair(-0.95, 1.15); cafeChair(1.2, 1.05);
     cafeTable(-2.3, 1.3); cafeChair(-2.3, 1.6);
     cafeTable(2.3, 1.3); cafeChair(2.3, 1.6);
     // coffee cups on the main table
@@ -262,8 +262,8 @@ export class World {
         b.add(boxGeo(V(N[0] + cx + lx, D0, cz + lz), V(N[0] + cx + lx + 0.06, D0 + 0.44, cz + lz + 0.06)), M.darkWood);
     };
     kantinTable(-1.8, 0.4, 0.75); kantinChair(-0.7, 0.9);
-    kantinTable(1.2, 3.4, 1.75); kantinChair(1.5, 1.9); kantinChair(2.3, 1.75); kantinChair(3.1, 1.95);
-    for (const [cx, cz] of [[1.6, 1.7], [2.4, 1.8], [3.0, 1.68]] as const)
+    kantinTable(0.7, 2.6, 1.75); kantinChair(1.0, 1.9); kantinChair(1.65, 1.75); kantinChair(2.25, 1.95);
+    for (const [cx, cz] of [[1.1, 1.7], [1.75, 1.8], [2.3, 1.68]] as const)
       b.add(new THREE.CylinderGeometry(0.09, 0.07, 0.05, 10), M.white, new THREE.Matrix4().makeTranslation(N[0] + cx, D0 + 0.77, cz));
 
     // ---- DAPUR set (shots 7-10): stove counter + pot (steam), cabinets, fridge, door, table ----
