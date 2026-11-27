@@ -103,7 +103,7 @@ export class World {
     this.hemi = new THREE.HemisphereLight("#cfe6ff", "#6c5c8c", 1.1);
     this.sun = new THREE.DirectionalLight("#fff0d6", 2.6);
     this.sun.castShadow = true;
-    const shadowSize = (getInputProps() as { post?: { shadow?: number } }).post?.shadow ?? 2048;
+    const shadowSize = (getInputProps() as { post?: { shadow?: number } }).post?.shadow ?? 4096;
     this.sun.shadow.mapSize.set(shadowSize, shadowSize);
     this.fill = new THREE.DirectionalLight("#9fb8ff", 0.35);
     R.add(this.hemi, this.sun, this.sun.target, this.fill, this.fill.target);
@@ -181,7 +181,6 @@ export class World {
       b.add(boxGeo(V(K[0] + 3.4, D0 + 0.78 + i * 0.07, 1.05), V(K[0] + 3.85, D0 + 0.85 + i * 0.07, 1.4)), lam("bhBook" + i, () => ({ color: bookCols[i] })));
     b.add(new THREE.CylinderGeometry(0.03, 0.05, 0.4, 8), M.iron, new THREE.Matrix4().makeTranslation(K[0] + 2.7, D0 + 0.98, 1.5));
     b.add(new THREE.ConeGeometry(0.16, 0.18, 10, 1, true), lam("bhDeskLamp", () => ({ color: "#e8c85a", side: THREE.DoubleSide })), new THREE.Matrix4().makeTranslation(K[0] + 2.7, D0 + 1.2, 1.5));
-    b.add(boxGeo(V(K[0] - 2.2, D0 + 0.02, -0.8), V(K[0] + 2.6, D0 + 0.06, 1.8)), lam("bhRug", () => ({ color: "#b5653f" })));
 
     // ---- KANTOR set (shot 3): boss desk + side desk with monitor + cabinet ----
     b.add(quadUp(O[0] - 6, O[0] + 6, -5, 5, 6, 5, 0.02), M.planks);
@@ -218,9 +217,9 @@ export class World {
     b.add(boxGeo(V(H[0] - 3.0, D0 + 2.75, 1.6), V(H[0] + 3.0, D0 + 2.87, 3.6)), M.red);
     b.add(boxGeo(V(H[0] - 3.0, D0 + 2.87, 1.6), V(H[0] + 3.0, D0 + 3.03, 3.6)), lam("bhRoofTop", () => ({ color: "#a83226" })));
     // bench (seat top at D0 + 0.5), folk(2) sits here
-    b.add(boxGeo(V(H[0] - 2.9, D0 + 0.44, 0.75), V(H[0] - 1.7, D0 + 0.5, 1.05)), M.darkWood);
-    b.add(boxGeo(V(H[0] - 2.9, D0 + 0.5, 0.98), V(H[0] - 1.7, D0 + 0.95, 1.05)), M.darkWood);
-    for (const lx of [-2.8, -1.8]) b.add(boxGeo(V(H[0] + lx, D0, 0.8), V(H[0] + lx + 0.1, D0 + 0.44, 1.0)), M.iron);
+    b.add(boxGeo(V(H[0] - 2.4, D0 + 0.44, 0.75), V(H[0] - 1.2, D0 + 0.5, 1.05)), M.darkWood);
+    b.add(boxGeo(V(H[0] - 2.4, D0 + 0.5, 0.98), V(H[0] - 1.2, D0 + 0.95, 1.05)), M.darkWood);
+    for (const lx of [-2.3, -1.3]) b.add(boxGeo(V(H[0] + lx, D0, 0.8), V(H[0] + lx + 0.1, D0 + 0.44, 1.0)), M.iron);
     // clock pole (clock face is an fx card from cast.ts)
     b.add(new THREE.CylinderGeometry(0.05, 0.05, 2.6, 8), M.iron, new THREE.Matrix4().makeTranslation(H[0] + 1.4, D0 + 1.3, 0.2));
     b.add(new THREE.CylinderGeometry(0.16, 0.16, 0.1, 10), M.iron, new THREE.Matrix4().makeTranslation(H[0] + 1.4, D0 + 2.62, 0.2));
@@ -265,6 +264,9 @@ export class World {
     cafeTable(0.1, 1.3); cafeChair(-0.55, 1.0); cafeChair(0.75, 1.6);
     cafeTable(-2.3, 1.3); cafeChair(-2.3, 1.6);
     cafeTable(2.3, 1.3); cafeChair(2.3, 1.6);
+    // foreground table near the camera side: low, reads as soft DOF depth in cafe angles
+    cafeTable(-1.8, -2.2);
+    b.add(new THREE.CylinderGeometry(0.055, 0.045, 0.09, 10), lam("bhCupBlue", () => ({ color: "#7bc4e8" })), new THREE.Matrix4().makeTranslation(C[0] - 1.65, D0 + 0.81, -2.32));
     // coffee cups on the main table
     for (const [cx, cz] of [[-0.15, 1.15], [0.35, 1.45]] as const)
       b.add(new THREE.CylinderGeometry(0.055, 0.045, 0.09, 10), M.white, new THREE.Matrix4().makeTranslation(C[0] + cx, D0 + 0.81, cz));

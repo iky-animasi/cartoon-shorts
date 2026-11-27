@@ -1,7 +1,8 @@
-// "Di Dunia Ini Kamu Nggak Bisa Bohong": 52 s vertical short, same house style as molasses
-// (flat 2D characters in a 3D toon world) but rendered with the LIGHT PROFILE by default:
-// DOF off (lens+pre), shadow 2048, MSAA 0, ink/bloom/grade on, grain off. Post chain:
-// InkPass -> [bloom + NEUTRAL tone mapping + colour grade]. Pixel-sized parameters are specified
+// "Di Dunia Ini Kamu Nggak Bisa Bohong" v2: 62 s vertical short, same house style as molasses
+// (flat 2D characters in a 3D toon world) rendered with the FULL PROFILE by default
+// (light/FULL_PROFILE.md): DOF on (lens+pre, focus per angle from story.dofAt), shadow 4096,
+// MSAA 4, ink/bloom/grade on, grain on. Post chain: InkPass -> lens pre -> lens main ->
+// [bloom + NEUTRAL tone mapping + colour grade] -> grain. Pixel-sized parameters are specified
 // at 1080x1920 and scaled with output size, so scale-0.5 stills match the final.
 import React, { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
@@ -19,9 +20,9 @@ import { TOTAL, SHOTS, layersAt, dofAt } from "./story";
 
 export const DTB_FRAMES = TOTAL;
 
-/** Light profile is the DEFAULT for this video; inputProps `{ post: {...} }` can still override for tests. */
+/** Full profile is the DEFAULT for this video (v2); inputProps `{ post: {...} }` can still override for tests. */
 type PostToggles = { ink: boolean; lens: boolean; pre: boolean; bloom: boolean; grade: boolean; grain: boolean; shadow: number; msaa: number };
-const toggles = (): PostToggles => ({ ink: true, lens: false, pre: false, bloom: true, grade: true, grain: false, shadow: 2048, msaa: 0, ...((getInputProps() as { post?: Partial<PostToggles> }).post ?? {}) });
+const toggles = (): PostToggles => ({ ink: true, lens: true, pre: true, bloom: true, grade: true, grain: true, shadow: 4096, msaa: 4, ...((getInputProps() as { post?: Partial<PostToggles> }).post ?? {}) });
 
 const makeBloom = () => {
   const b = new BloomEffect({ blendFunction: BlendFunction.ADD, intensity: 0.5, luminanceThreshold: 1.0, luminanceSmoothing: 0.2, mipmapBlur: true, levels: 6, radius: 0.6 });
@@ -100,7 +101,7 @@ export const DuniaTanpaBohong: React.FC = () => {
   const kit = useKit();
   if (!kit) return null;
   return (
-    <AbsoluteFill style={{ background: "#cfe3f2" }}>
+    <AbsoluteFill style={{ background: "#f5eedd" }}>
       {layersAt(f).map((l, i) => <ShotView key={i ? "over" : "base"} id={l.id} kit={kit} alpha={l.alpha} />)}
     </AbsoluteFill>
   );
