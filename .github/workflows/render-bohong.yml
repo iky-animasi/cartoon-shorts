@@ -38,7 +38,7 @@ jobs:
           END=$(( START + 93 ))
           if [ $END -gt 1868 ]; then END=1868; fi
           echo "Chunk ${{ matrix.chunk }}: frame $START-$END"
-          REMOTION_TMP=$PWD/.remotion-tmp npx remotion render DuniaTanpaBohong out/chunk-${{ matrix.chunk }}.mp4 --frames=$START-$END
+          REMOTION_TMP=$PWD/.remotion-tmp npx remotion render DuniaTanpaBohong out/chunk-${{ matrix.chunk }}.mp4 --frames=$START-$END --timeout=120000
       - uses: actions/upload-artifact@v4
         with:
           name: bohong-chunk-${{ matrix.chunk }}

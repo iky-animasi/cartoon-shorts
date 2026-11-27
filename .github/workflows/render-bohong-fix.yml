@@ -1,0 +1,46 @@
+# Render paralel GitHub Actions — komposisi DuniaTanpaBohong, 1869 frame
+# dibagi ke 20 job matrix (94 frame/job), lalu job merge menggabung semua
+# potongan jadi satu file video-saja. Audio (mix.wav) digabung lokal.
+# Disiapkan 2026-11-26 (proaktif): episode 4 sudah picture lock (44 still QC,
+# mix.wav 62,3 dtk, -15,0 LUFS) — render bisa jalan paralel selagi build ep.6-8 lanjut.
+name: Render Bohong Fix Chunk 10-11
+
+on:
+  workflow_dispatch:
+
+jobs:
+  render-chunk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [10, 11]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Chrome system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64 libpango-1.0-0 libcairo2 libnss3 libnspr4 libx11-6 libxext6
+      - name: Install project dependencies
+        run: |
+          npm ci --no-audit --no-fund
+          node scripts/patch-remotion-ports.mjs
+          npx remotion browser ensure
+      - name: Render chunk ${{ matrix.chunk }}
+        run: |
+          mkdir -p out .remotion-tmp
+          START=$(( ${{ matrix.chunk }} * 94 ))
+          END=$(( START + 93 ))
+          if [ $END -gt 1868 ]; then END=1868; fi
+          echo "Chunk ${{ matrix.chunk }}: frame $START-$END"
+          REMOTION_TMP=$PWD/.remotion-tmp npx remotion render DuniaTanpaBohong out/chunk-${{ matrix.chunk }}.mp4 --frames=$START-$END --timeout=120000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bohong-chunk-${{ matrix.chunk }}
+          path: out/chunk-${{ matrix.chunk }}.mp4
+
